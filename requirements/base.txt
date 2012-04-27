@@ -1,0 +1,9 @@
+GitPython==0.3.2.RC1
+async==0.6.1
+certifi==0.0.8
+chardet==1.0.1
+gitdb==0.5.4
+pygithub3==0.3
+requests==0.11.2
+smmap==0.8.2
+wsgiref==0.1.2
