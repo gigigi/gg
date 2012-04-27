@@ -3,6 +3,15 @@ gg
 
 A command line interface to glue together git and GitHub.
 
+installation
+============
+
+This package is still in a pre-alpha state and is not published
+in PyPI yet. For installation, download the source code and type:
+
+::
+
+    python setup.py install
 
 usage
 =====
@@ -22,6 +31,14 @@ Creates a local git repo in ``path`` (which defaults to ``PWD``) and a
 GitHub repo called ``name``.
 
 Two remotes are created in the git repo: ``ssh`` and ``https``.
+
+
+``clone``::
+
+    gg clone [[author] repo [path]]
+
+Makes a clone of ``author``s ``repo`` in ``path``. The default ``author`` is the
+authenticating user.
 
 
 ``info``::

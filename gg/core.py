@@ -9,10 +9,11 @@ The heart of `gg`.
 
 import re
 from gettext import gettext as _
+from os import path, getcwd
 
 import pygithub3
 from git import Repo, Remote
-from git.exc import InvalidGitRepositoryError
+from git.exc import InvalidGitRepositoryError, GitCommandError
 
 
 # GitHub remotes
@@ -40,6 +41,16 @@ def extract_username_and_repo(remote):
     else:
         return user, repo
 
+def add_github_remotes(repo, repo_name, user):
+    """Add GitHub SSH and HTTPS remote urls to `repo`."""
+    template_args = dict(user=user, repo=repo_name)
+    Remote.add(repo=repo, 
+               name='ssh', 
+               url=SSH_REMOTE.format(**template_args))
+    Remote.add(repo=repo, 
+               name='https', 
+               url=HTTPS_REMOTE.format(**template_args))
+
 
 class GitHub(pygithub3.Github):
     """
@@ -65,13 +76,7 @@ class GitHub(pygithub3.Github):
             print _("Looks like you already have a repo called %s" % name)
 
         # add remotes
-        template_args = dict(user=self._username, repo=repo_name)
-        Remote.add(repo=repo, 
-                   name='ssh', 
-                   url=SSH_REMOTE.format(**template_args))
-        Remote.add(repo=repo, 
-                   name='https', 
-                   url=HTTPS_REMOTE.format(**template_args))
+        add_github_remotes(repo, user, repo_name)
 
     def info(self, repo_path):
         try:
@@ -119,3 +124,14 @@ class GitHub(pygithub3.Github):
                 'language': gh_repo.language,
             })
         print unicode(INFO_TEMPLATE).format(**defaults)
+
+    def clone(self, repo, repo_path=None, author=None):
+        repo_path = path.join(getcwd(), repo) if repo_path is None else repo_path
+        author = self._username if author is None else author
+
+        gh_repo = self.repos.get(user=author, repo=repo)
+        local_repo = Repo.clone_from(url=gh_repo.clone_url,
+                                     to_path=repo_path,)
+
+        # add remotes
+        add_github_remotes(local_repo, repo, author)

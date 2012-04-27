@@ -53,6 +53,23 @@ info_parser.add_argument('repo_path',
                          help=_('The path to the directory of the repo'))
 info_parser.set_defaults(repo_path=CWD)
 
+# clone
+clone_parser = subparsers.add_parser('clone',
+                                     description=_('clone a repository'),)
+clone_parser.add_argument('author',
+                          nargs='?',
+                          type=str,
+                          help=_('The author of the repo'))
+clone_parser.set_defaults(author=None)
+clone_parser.add_argument('repo',
+                          type=str,
+                          help=_('The name of the repo'))
+clone_parser.add_argument('repo_path',
+                          nargs='?',
+                          type=str,
+                          help=_('The path in which to store the repo'))
+clone_parser.set_defaults(repo_path=None)
+
 # version
 version = "%s %s" % ( __name__, __version__)
 parser.add_argument("-v", "--version", 
@@ -68,15 +85,19 @@ def main():
         parser.parse_args(['--help'])
         exit(0)
 
+    repo_path = args.repo_path
     command = args.command
     
     if command == 'init':
-        repo_path = args.repo_path
         repo_name = args.repo_name
         gh.new_repo(repo_name, repo_path)
     elif command == 'info':
-        repo_path = args.repo_path
         gh.info(repo_path)
+    elif command == 'clone':
+        repo = args.repo
+        author = args.author
+        gh.clone(repo, repo_path, author)
+
 
 
     exit(0)
