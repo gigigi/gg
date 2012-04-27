@@ -42,9 +42,16 @@ init_parser.add_argument('repo_path',
                          type=str,
                          help=_('The path to the directory in which the repo will be created'))
 init_parser.set_defaults(repo_path=CWD)
-init_parser.set_defaults(func=gh.new_repo)
 
                     
+# info
+info_parser = subparsers.add_parser('info',
+                                     description=_('show information about a git repository in GitHub'),)
+info_parser.add_argument('repo_path',
+                         nargs='?',
+                         type=str,
+                         help=_('The path to the directory of the repo'))
+info_parser.set_defaults(repo_path=CWD)
 
 # version
 version = "%s %s" % ( __name__, __version__)
@@ -62,10 +69,14 @@ def main():
         exit(0)
 
     command = args.command
-    repo_path = args.repo_path
-    repo_name = args.repo_name
-    handler = args.func
     
-    handler(repo_name, repo_path)
+    if command == 'init':
+        repo_path = args.repo_path
+        repo_name = args.repo_name
+        gh.new_repo(repo_name, repo_path)
+    elif command == 'info':
+        repo_path = args.repo_path
+        gh.info(repo_path)
+
 
     exit(0)

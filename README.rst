@@ -22,3 +22,11 @@ Creates a local git repo in ``path`` (which defaults to ``PWD``) and a
 GitHub repo called ``name``.
 
 Two remotes are created in the git repo: ``ssh`` and ``https``.
+
+
+``info``::
+
+    gg info [path]
+
+Prints information of the repo contained in ``path``. By default, it shows 
+current directory repository's information.
