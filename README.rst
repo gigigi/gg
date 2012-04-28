@@ -33,9 +33,17 @@ GitHub repo called ``name``.
 Two remotes are created in the git repo: ``ssh`` and ``https``.
 
 
+``fork``::
+
+    gg fork author repo [path]
+
+Forks ``repo`` and clones the fork into ``path``. The clone will have a 
+``upstream`` remote with the original repo's url.
+
+
 ``clone``::
 
-    gg clone [[author] repo [path]]
+    gg clone [author] repo [path]
 
 Makes a clone of ``author``s ``repo`` in ``path``. The default ``author`` is the
 authenticating user.

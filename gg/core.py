@@ -41,15 +41,16 @@ def extract_username_and_repo(remote):
     else:
         return user, repo
 
+def add_remote(repo, remote_name, remote_url):
+    Remote.add(repo=repo, 
+               name=remote_name,
+               url=remote_url)
+
 def add_github_remotes(repo, repo_name, user):
     """Add GitHub SSH and HTTPS remote urls to `repo`."""
     template_args = dict(user=user, repo=repo_name)
-    Remote.add(repo=repo, 
-               name='ssh', 
-               url=SSH_REMOTE.format(**template_args))
-    Remote.add(repo=repo, 
-               name='https', 
-               url=HTTPS_REMOTE.format(**template_args))
+    add_remote(repo, 'ssh', SSH_REMOTE.format(**template_args))
+    add_remote(repo, 'https', HTTPS_REMOTE.format(**template_args))
 
 
 class GitHub(pygithub3.Github):
@@ -125,9 +126,9 @@ class GitHub(pygithub3.Github):
             })
         print unicode(INFO_TEMPLATE).format(**defaults)
 
-    def clone(self, repo, repo_path=None, author=None):
-        repo_path = path.join(getcwd(), repo) if repo_path is None else repo_path
-        author = self._username if author is None else author
+    def clone(self, author, repo, repo_path):
+        repo_path = path.join(getcwd(), repo) if not repo_path else repo_path
+        author = self._username if not author else author
 
         gh_repo = self.repos.get(user=author, repo=repo)
         local_repo = Repo.clone_from(url=gh_repo.clone_url,
@@ -135,3 +136,24 @@ class GitHub(pygithub3.Github):
 
         # add remotes
         add_github_remotes(local_repo, repo, author)
+
+    # TODO: `org` param
+    def fork(self, author, repo, repo_path):
+        repo_path = path.join(getcwd(), repo) if not repo_path else repo_path
+
+        try:
+            gh_repo = self.repos.get(user=author, repo=repo)
+            self.repos.forks.create(user=author, repo=repo)
+            forked_repo = self.repos.get(user=self._username, repo=repo) 
+            clone_url = forked_repo.clone_url
+        except AssertionError:
+            clone_url = HTTPS_REMOTE.format(**{'user': self._username,
+                                               'repo': repo})
+            
+
+        local_repo = Repo.clone_from(url=clone_url,
+                                     to_path=repo_path,)
+
+        # add remotes
+        add_github_remotes(local_repo, repo, author)
+        add_remote(local_repo, 'upstream', gh_repo.clone_url)

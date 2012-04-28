@@ -53,6 +53,23 @@ info_parser.add_argument('repo_path',
                          help=_('The path to the directory of the repo'))
 info_parser.set_defaults(repo_path=CWD)
 
+# fork
+fork_parser = subparsers.add_parser('fork',
+                                     description=_('fork a repository'),)
+fork_parser.add_argument('author',
+                          nargs='?',
+                          type=str,
+                          help=_('The author of the repo'))
+fork_parser.set_defaults(author=None)
+fork_parser.add_argument('repo',
+                          type=str,
+                          help=_('The name of the repo'))
+fork_parser.add_argument('repo_path',
+                          nargs='?',
+                          type=str,
+                          help=_('The path in which to store the repo'))
+fork_parser.set_defaults(repo_path=None)
+
 # clone
 clone_parser = subparsers.add_parser('clone',
                                      description=_('clone a repository'),)
@@ -93,10 +110,14 @@ def main():
         gh.new_repo(repo_name, repo_path)
     elif command == 'info':
         gh.info(repo_path)
+    elif command == 'fork':
+        repo = args.repo
+        author = args.author
+        gh.fork(author, repo, repo_path)
     elif command == 'clone':
         repo = args.repo
         author = args.author
-        gh.clone(repo, repo_path, author)
+        gh.clone(author, repo, repo_path)
 
 
 
